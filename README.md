@@ -17,17 +17,17 @@
 4. run docker container for db
 
    ```sh
-       docker compose up -d
+      docker compose up -d
    ```
 
 5. run dev server
 
    ```sh
-       pnpm start:dev
+      pnpm start:dev
    ```
 
 6. Open Apollo Studio in browser
 
    ```http
-   localhost:3000/graphql
+      localhost:3000/graphql
    ```
