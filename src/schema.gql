@@ -6,27 +6,41 @@ type Item {
   id: ID!
   name: String!
   quantity: Float!
-  quantityUnit: String!
+  quantityUnit: String
 }
 
 type Query {
   items: [Item!]!
-  item(id: Int!): Item!
+  item(id: ID!): Item!
 }
 
 type Mutation {
   createItem(createItemInput: CreateItemInput!): Item!
   updateItem(updateItemInput: UpdateItemInput!): Item!
-  removeItem(id: Int!): Item!
+  removeItem(id: ID!): Item!
 }
 
 input CreateItemInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  """Name of the item"""
+  name: String!
+
+  """Quantity of the item"""
+  quantity: Float!
+
+  """Unit of measurement"""
+  quantityUnit: String
 }
 
 input UpdateItemInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  """Name of the item"""
+  name: String
+
+  """Quantity of the item"""
+  quantity: Float
+
+  """Unit of measurement"""
+  quantityUnit: String
+
+  """ID of the item to update"""
+  id: ID!
 }

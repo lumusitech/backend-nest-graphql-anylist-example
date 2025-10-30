@@ -1,35 +1,42 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { ItemsService } from './items.service';
+import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
+
+import { ParseUUIDPipe } from '@nestjs/common';
+import { CreateItemInput, UpdateItemInput } from './dto/inputs';
 import { Item } from './entities/item.entity';
-import { CreateItemInput } from './dto/create-item.input';
-import { UpdateItemInput } from './dto/update-item.input';
+import { ItemsService } from './items.service';
 
 @Resolver(() => Item)
 export class ItemsResolver {
   constructor(private readonly itemsService: ItemsService) {}
 
   @Mutation(() => Item)
-  createItem(@Args('createItemInput') createItemInput: CreateItemInput) {
-    return this.itemsService.create(createItemInput);
+  async createItem(
+    @Args('createItemInput') createItemInput: CreateItemInput,
+  ): Promise<Item> {
+    return await this.itemsService.create(createItemInput);
   }
 
   @Query(() => [Item], { name: 'items' })
-  findAll() {
-    return this.itemsService.findAll();
+  async findAll(): Promise<Item[]> {
+    return await this.itemsService.findAll();
   }
 
   @Query(() => Item, { name: 'item' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.itemsService.findOne(id);
+  async findOne(
+    @Args('id', { type: () => ID }, ParseUUIDPipe) id: string,
+  ): Promise<Item> {
+    return await this.itemsService.findOne(id);
   }
 
   @Mutation(() => Item)
-  updateItem(@Args('updateItemInput') updateItemInput: UpdateItemInput) {
-    return this.itemsService.update(updateItemInput.id, updateItemInput);
+  async updateItem(
+    @Args('updateItemInput') updateItemInput: UpdateItemInput,
+  ): Promise<Item> {
+    return await this.itemsService.update(updateItemInput.id, updateItemInput);
   }
 
   @Mutation(() => Item)
-  removeItem(@Args('id', { type: () => Int }) id: number) {
+  removeItem(@Args('id', { type: () => ID }) id: string): Promise<Item> {
     return this.itemsService.remove(id);
   }
 }
