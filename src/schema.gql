@@ -2,19 +2,24 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Item {
-  id: ID!
-  name: String!
-  quantity: Float!
-  quantityUnit: String
-}
-
 type User {
   id: ID!
   fullName: String!
   email: String!
   roles: [String!]!
   active: Boolean!
+}
+
+type AuthResponse {
+  token: String!
+  user: User!
+}
+
+type Item {
+  id: ID!
+  name: String!
+  quantity: Float!
+  quantityUnit: String
 }
 
 type Query {
@@ -29,6 +34,7 @@ type Mutation {
   updateItem(updateItemInput: UpdateItemInput!): Item!
   removeItem(id: ID!): Item!
   blockUser(id: ID!): User!
+  signup(signupInput: SignupInput!): AuthResponse!
 }
 
 input CreateItemInput {
@@ -54,4 +60,10 @@ input UpdateItemInput {
 
   """ID of the item to update"""
   id: ID!
+}
+
+input SignupInput {
+  email: String!
+  fullName: String!
+  password: String!
 }

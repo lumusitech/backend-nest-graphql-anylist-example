@@ -1,12 +1,37 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserInput } from './dto/create-user.input';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { SignupInput } from 'src/auth/dto/inputs/signup.input';
+import { Repository } from 'typeorm';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 
+interface ErrorDB {
+  code: string;
+  detail: string;
+}
+
 @Injectable()
 export class UsersService {
-  create(createUserInput: CreateUserInput) {
-    return 'This action adds a new user';
+  private logger = new Logger('UsersService');
+
+  constructor(
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
+  ) {}
+
+  async create(signupInput: SignupInput) {
+    try {
+      const user = this.usersRepository.create(signupInput);
+
+      return await this.usersRepository.save(user);
+    } catch (error) {
+      this.handleDbErrors(error);
+    }
   }
 
   async findAll(): Promise<User[]> {
@@ -23,5 +48,20 @@ export class UsersService {
 
   block(id: string): Promise<User> {
     throw new Error('blockUser method not implemented.');
+  }
+
+  private handleDbErrors(error: ErrorDB): never {
+    this.logger.error(error.detail);
+
+    if (error.code === '23505') {
+      throw new BadRequestException(
+        error.detail
+          //? For a better message you can use:
+          .replace('Key ', '')
+          .replaceAll('(', '')
+          .replaceAll(')', ''),
+      );
+    }
+    throw new InternalServerErrorException('Please check server logs');
   }
 }
