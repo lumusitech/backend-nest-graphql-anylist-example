@@ -9,11 +9,11 @@ import { AuthModule } from './auth/auth.module';
 import { ItemsModule } from './items/items.module';
 import { UsersModule } from './users/users.module';
 
-interface NestValidationError {
-  statusCode: 400; // El ValidationPipe siempre usa 400 Bad Request
-  message: string[]; // Un array de strings con los mensajes de class-validator
-  error: 'Bad Request';
-}
+// interface NestValidationError {
+//   statusCode: 400; // El ValidationPipe siempre usa 400 Bad Request
+//   message: string[]; // Un array de strings con los mensajes de class-validator
+//   error: 'Bad Request';
+// }
 
 @Module({
   imports: [
