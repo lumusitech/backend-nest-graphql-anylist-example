@@ -40,12 +40,13 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return [];
+    return this.usersRepository.find({});
   }
 
   async findOneByEmail(email: string): Promise<User> {
     try {
       return await this.usersRepository.findOneByOrFail({ email });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       //? Option 1:
       //?  throw new NotFoundException(`User with email ${email} not found`);
@@ -54,6 +55,18 @@ export class UsersService {
       this.handleDbErrors({
         code: 'custom-error-001',
         detail: `User with email ${email} not found`,
+      });
+    }
+  }
+
+  async findOneById(id: string): Promise<User | null> {
+    try {
+      return await this.usersRepository.findOneByOrFail({ id });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      this.handleDbErrors({
+        code: 'custom-error-002',
+        detail: `User with id ${id} not found`,
       });
     }
   }

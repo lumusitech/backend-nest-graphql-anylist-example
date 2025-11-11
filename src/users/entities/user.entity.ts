@@ -30,7 +30,7 @@ export class User {
 
   @Column({ type: 'boolean', default: true })
   @Field(() => Boolean)
-  active: boolean;
+  isActive: boolean;
 
   //TODO: Add relations with other entities
 }

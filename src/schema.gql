@@ -7,7 +7,7 @@ type User {
   fullName: String!
   email: String!
   roles: [String!]!
-  active: Boolean!
+  isActive: Boolean!
 }
 
 type AuthResponse {
@@ -27,6 +27,7 @@ type Query {
   item(id: ID!): Item!
   users: [User!]!
   user(email: String!): User!
+  revalidate: AuthResponse!
 }
 
 type Mutation {
