@@ -8,7 +8,7 @@ import { SignupInput } from './dto/inputs/signup.input';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthResponse } from './types/auth-response.type';
 
-@Resolver()
+@Resolver(() => AuthResolver)
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
@@ -28,7 +28,9 @@ export class AuthResolver {
 
   @Query(() => AuthResponse, { name: 'revalidate' })
   @UseGuards(JwtAuthGuard)
-  revalidateToken(@CurrentUser() user: User): AuthResponse {
+  revalidateToken(
+    @CurrentUser(/*[ValidRoles.superUser, ValidRoles.admin]*/) user: User,
+  ): AuthResponse {
     return this.authService.revalidateUser(user);
   }
 }

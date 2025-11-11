@@ -2,6 +2,8 @@ import { ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
 
+//? We need extends and override AuthGuard's getContext method
+//? because we need a GraphQl Context in place of a traditional rest full api context
 export class JwtAuthGuard extends AuthGuard('jwt') {
   //! Override
   getRequest(context: ExecutionContext) {
