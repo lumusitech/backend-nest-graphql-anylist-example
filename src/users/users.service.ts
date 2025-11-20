@@ -8,9 +8,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { SignupInput } from 'src/auth/dto/inputs/signup.input';
-import { Repository } from 'typeorm';
+import { ArrayOverlap, In, Repository } from 'typeorm';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
+import { ValidRoles } from '../auth/enums/valid-roles.enum';
 
 interface CustomErrorDB {
   code: string;
@@ -24,7 +25,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async create(signupInput: SignupInput) {
     try {
@@ -39,8 +40,13 @@ export class UsersService {
     }
   }
 
-  async findAll(): Promise<User[]> {
-    return this.usersRepository.find({});
+  async findAll(roles: ValidRoles[]): Promise<User[]> {
+    if (roles.length === 0) return this.usersRepository.find();
+
+    return this.usersRepository.createQueryBuilder()
+      .andWhere('ARRAY[roles] && ARRAY[:...roles]')
+      .setParameter('roles', roles)
+      .getMany();
   }
 
   async findOneByEmail(email: string): Promise<User> {
