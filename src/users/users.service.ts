@@ -41,7 +41,14 @@ export class UsersService {
   }
 
   async findAll(roles: ValidRoles[]): Promise<User[]> {
-    if (roles.length === 0) return this.usersRepository.find();
+    if (roles.length === 0) return this.usersRepository.find(
+      //? Not necessary because we have lazy: true within this property
+      // {
+      //   relations: {
+      //     lastUpdateBy: true,
+      //   }
+      // }
+    );
 
     return this.usersRepository.createQueryBuilder()
       .andWhere('ARRAY[roles] && ARRAY[:...roles]')
@@ -65,7 +72,7 @@ export class UsersService {
     }
   }
 
-  async findOneById(id: string): Promise<User | null> {
+  async findOneById(id: string): Promise<User> {
     try {
       return await this.usersRepository.findOneByOrFail({ id });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -81,8 +88,13 @@ export class UsersService {
     return `This action updates a #${id} user`;
   }
 
-  block(id: string): Promise<User> {
-    throw new Error('blockUser method not implemented.');
+  async block(id: string, adminUser: User): Promise<User> {
+    const userToBlock = await this.findOneById(id);
+
+    userToBlock.isActive = false;
+    userToBlock.lastUpdateBy = adminUser;
+
+    return await this.usersRepository.save(userToBlock);
   }
 
   private handleDbErrors(error: CustomErrorDB): never {
