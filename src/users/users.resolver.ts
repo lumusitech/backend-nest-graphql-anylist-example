@@ -19,7 +19,6 @@ export class UsersResolver {
     @Args() validRoles: ValidRolesArgs,
     @CurrentUser([ValidRoles.admin]) adminUser: User,
   ): Promise<User[]> {
-    console.log(adminUser);
     return this.usersService.findAll(validRoles.roles);
   }
 
