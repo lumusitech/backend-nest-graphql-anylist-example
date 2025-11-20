@@ -8,10 +8,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { SignupInput } from 'src/auth/dto/inputs/signup.input';
-import { ArrayOverlap, In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import { ValidRoles } from '../auth/enums/valid-roles.enum';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
-import { ValidRoles } from '../auth/enums/valid-roles.enum';
 
 interface CustomErrorDB {
   code: string;
@@ -84,9 +84,40 @@ export class UsersService {
     }
   }
 
-  update(id: number, updateUserInput: UpdateUserInput) {
-    return `This action updates a #${id} user`;
+  //? Update v1: My way
+  async updateV1(id: string, updateUserInput: UpdateUserInput, adminUser: User): Promise<User> {
+    const user = await this.findOneById(id);
+
+    try {
+      user.lastUpdateBy = adminUser;
+      return await this.usersRepository.save({
+        ...user,
+        ...updateUserInput,
+      });
+    } catch (error) {
+      this.handleDbErrors(error as unknown as CustomErrorDB);
+    }
   }
+
+  async update(id: string, updateUserInput: UpdateUserInput, adminUser: User): Promise<User> {
+    try {
+      const user = await this.usersRepository.preload({
+        ...updateUserInput,
+        id,
+      });
+
+      if (!user) {
+        throw new NotFoundException(`User with id ${id} not found`);
+      }
+
+      user.lastUpdateBy = adminUser;
+
+      return await this.usersRepository.save(user);
+    } catch (error) {
+      this.handleDbErrors(error as unknown as CustomErrorDB);
+    }
+  }
+
 
   async block(id: string, adminUser: User): Promise<User> {
     const userToBlock = await this.findOneById(id);
