@@ -17,6 +17,7 @@ type User {
   isActive: Boolean!
   items: [Item!]!
   lastUpdateBy: User
+  itemsCount: Int!
 }
 
 type AuthResponse {
