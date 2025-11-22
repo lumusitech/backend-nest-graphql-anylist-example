@@ -4,16 +4,17 @@ import { CreateItemInput, UpdateItemInput } from './dto/inputs';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Item } from './entities/item.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class ItemsService {
   constructor(
     @InjectRepository(Item)
     private readonly itemsRepository: Repository<Item>,
-  ) {}
+  ) { }
 
-  async create(createItemInput: CreateItemInput): Promise<Item> {
-    const newItem = this.itemsRepository.create(createItemInput);
+  async create(createItemInput: CreateItemInput, owner: User): Promise<Item> {
+    const newItem = this.itemsRepository.create({ ...createItemInput, user: owner });
 
     //? Here you can add additional logic before saving the item, if needed
 

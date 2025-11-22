@@ -2,25 +2,26 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Item {
+  id: ID!
+  name: String!
+  quantityUnit: String
+  user: User!
+}
+
 type User {
   id: ID!
   fullName: String!
   email: String!
   roles: [String!]!
   isActive: Boolean!
+  items: [Item!]!
   lastUpdateBy: User
 }
 
 type AuthResponse {
   token: String!
   user: User!
-}
-
-type Item {
-  id: ID!
-  name: String!
-  quantity: Float!
-  quantityUnit: String
 }
 
 type Query {
@@ -74,9 +75,6 @@ input CreateItemInput {
   """Name of the item"""
   name: String!
 
-  """Quantity of the item"""
-  quantity: Float!
-
   """Unit of measurement"""
   quantityUnit: String
 }
@@ -84,9 +82,6 @@ input CreateItemInput {
 input UpdateItemInput {
   """Name of the item"""
   name: String
-
-  """Quantity of the item"""
-  quantity: Float
 
   """Unit of measurement"""
   quantityUnit: String

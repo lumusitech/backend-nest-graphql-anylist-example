@@ -8,10 +8,10 @@ export class CreateItemInput {
   @IsNotEmpty()
   name: string;
 
-  @Field(() => Float, { description: 'Quantity of the item' })
-  @IsNotEmpty()
-  @IsPositive()
-  quantity: number;
+  // @Field(() => Float, { description: 'Quantity of the item' })
+  // @IsNotEmpty()
+  // @IsPositive()
+  // quantity: number;
 
   @Field(() => String, { description: 'Unit of measurement', nullable: true })
   @IsString()
