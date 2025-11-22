@@ -33,7 +33,7 @@ export class User {
   @Field(() => Boolean)
   isActive: boolean;
 
-  @OneToMany(() => Item, (item) => item.user)
+  @OneToMany(() => Item, (item) => item.user, { lazy: true })
   @Field(() => [Item])
   items: Item[];
 
