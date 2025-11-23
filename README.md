@@ -31,3 +31,11 @@
    ```http
       localhost:3000/graphql
    ```
+
+7. run seed - executeSeed mutation
+
+   ```graphql
+      mutation {
+         executeSeed
+      }
+   ```
