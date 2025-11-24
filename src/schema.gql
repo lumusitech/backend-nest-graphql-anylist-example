@@ -32,6 +32,11 @@ type AuthResponse {
   user: User!
 }
 
+type ListItem {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
 type Query {
   revalidate: AuthResponse!
   users(roles: [ValidRoles!] = [], offset: Int = 0, limit: Int = 10, search: String): [User!]!
@@ -41,6 +46,7 @@ type Query {
   lists(offset: Int = 0, limit: Int = 10, search: String): [List!]!
   list(id: ID!): List!
   listsCount: Int!
+  listItem(id: Int!): ListItem!
 }
 
 """
@@ -66,6 +72,9 @@ type Mutation {
 
   """execute seed to fill the database"""
   executeSeed: Boolean!
+  createListItem(createListItemInput: CreateListItemInput!): ListItem!
+  updateListItem(updateListItemInput: UpdateListItemInput!): ListItem!
+  removeListItem(id: Int!): ListItem!
 }
 
 input SignupInput {
@@ -114,4 +123,15 @@ input CreateListInput {
 input UpdateListInput {
   name: String
   id: ID!
+}
+
+input CreateListItemInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateListItemInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
 }
