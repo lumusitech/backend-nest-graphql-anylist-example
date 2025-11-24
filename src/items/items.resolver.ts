@@ -5,8 +5,10 @@ import { CreateItemInput, UpdateItemInput } from './dto/inputs';
 import { Item } from './entities/item.entity';
 import { ItemsService } from './items.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
-import { User } from 'src/users/entities/user.entity';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { User } from '../users/entities/user.entity';
+import { PaginationArgs } from '../common/dto/args/pagination.args';
+import { SearchArgs } from 'src/common/dto/args';
 
 @Resolver(() => Item)
 @UseGuards(JwtAuthGuard)
@@ -22,8 +24,11 @@ export class ItemsResolver {
   }
 
   @Query(() => [Item], { name: 'items' })
-  async findAll(@CurrentUser() user: User): Promise<Item[]> {
-    return await this.itemsService.findAll(user);
+  async findAll(
+    @Args() paginationArgs: PaginationArgs,
+    @Args() searchArgs: SearchArgs,
+    @CurrentUser() user: User): Promise<Item[]> {
+    return await this.itemsService.findAll(user, paginationArgs, searchArgs);
   }
 
   @Query(() => Item, { name: 'item' })
