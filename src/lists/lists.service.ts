@@ -1,26 +1,65 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateListInput } from './dto/create-list.input';
 import { UpdateListInput } from './dto/update-list.input';
+import { User } from 'src/users/entities/user.entity';
+import { PaginationArgs, SearchArgs } from 'src/common/dto/args';
+import { InjectRepository } from '@nestjs/typeorm';
+import { List } from './entities/list.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ListsService {
-  create(createListInput: CreateListInput) {
-    return 'This action adds a new list';
+  constructor(
+    @InjectRepository(List)
+    private readonly listRepository: Repository<List>
+  ) { }
+
+  async create(createListInput: CreateListInput, user: User): Promise<List> {
+    const newItem = this.listRepository.create({ ...createListInput, user });
+
+    //? Here you can add additional logic before saving the item, if needed
+
+    return await this.listRepository.save(newItem);
   }
 
-  findAll() {
-    return `This action returns all lists`;
+  async findAll(user: User, paginationArgs: PaginationArgs, searchArgs: SearchArgs): Promise<List[]> {
+    const { offset, limit } = paginationArgs;
+    const { search } = searchArgs;
+
+    const queryBuilder = this.listRepository.createQueryBuilder()
+      .skip(offset)
+      .take(limit)
+      .where(`"userId" = :userId`, { userId: user.id })
+
+    if (search) {
+      queryBuilder.andWhere('LOWER(name) like :name', { name: `%${search.toLowerCase()}%` })
+    }
+
+    return await queryBuilder.getMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} list`;
+  async findOne(id: string, user: User): Promise<List> {
+    try {
+      return await this.listRepository.findOneByOrFail({ id, user: { id: user.id } })
+    } catch (error) {
+      throw new NotFoundException(`List with ID ${id} not found`);
+    }
   }
 
-  update(id: number, updateListInput: UpdateListInput) {
-    return `This action updates a #${id} list`;
+  async update(id: string, updateListInput: UpdateListInput, user: User): Promise<List> {
+    const list = await this.findOne(id, user);
+
+    const updatedList = Object.assign(list, updateListInput);
+
+    return this.listRepository.save(updatedList);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} list`;
+  async remove(id: string, user: User): Promise<List> {
+    const list = await this.findOne(id, user);
+    return await this.listRepository.remove(list);
+  }
+
+  async listsCountByUser(user: User): Promise<number> {
+    return await this.listRepository.count({ where: { user: { id: user.id } } });
   }
 }

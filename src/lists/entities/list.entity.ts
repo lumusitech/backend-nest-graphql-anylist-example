@@ -1,8 +1,9 @@
 import { ObjectType, Field, Int, ID } from '@nestjs/graphql';
 import { IsString, MinLength } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
+@Entity({ name: 'lists' })
 @ObjectType()
 export class List {
   @Field(() => ID)
@@ -15,8 +16,8 @@ export class List {
   @MinLength(3)
   name: string;
 
-  @Field(() => User)
-  @ManyToOne(() => User, (user) => user.lists)
-  @Index('userId-list-index', ['user', 'id', 'list'])
+  @ManyToOne(() => User, (user) => user.list, { nullable: false, lazy: true })
+  @Index('userId-list-index')
+  @Field(() => User, { nullable: false })
   user: User;
 }

@@ -40,9 +40,8 @@ export class User {
 
   @OneToMany(() => List, (list) => list.user, { lazy: true })
   // @Field(() => [List]) // -- IGNORE -- to build the response with the resolveField
-  lists: List[];
+  list: List[];
 
-  //TODO: Add relations
   @ManyToOne(() => User, (user) => user.lastUpdateBy, { nullable: true, lazy: true })
   @JoinColumn({ name: 'last_update_by' })
   @Field(() => User, { nullable: true })
