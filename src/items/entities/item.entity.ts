@@ -13,13 +13,9 @@ export class Item {
   @Column()
   name: string;
 
-  // @Field(() => Float)
-  // @Column({ type: 'float' })
-  // quantity: number;
-
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
-  quantityUnit?: string; // e.g., kg, ml,liters, pieces
+  quantityUnit?: string; // e.g., kg, ml,litters, pieces
 
   // stores
   // user
