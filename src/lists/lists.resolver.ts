@@ -15,48 +15,48 @@ export class ListsResolver {
   constructor(private readonly listsService: ListsService) { }
 
   @Mutation(() => List)
-  createList(
+  async createList(
     @Args('createListInput') createListInput: CreateListInput,
     @CurrentUser() user: User
-  ) {
+  ): Promise<List> {
     return this.listsService.create(createListInput, user);
   }
 
   @Query(() => [List], { name: 'lists' })
-  findAll(
+  async findAll(
     @CurrentUser() user: User,
     @Args() paginationArgs: PaginationArgs,
     @Args() searchArgs: SearchArgs,
-  ) {
+  ): Promise<List[]> {
     return this.listsService.findAll(user, paginationArgs, searchArgs);
   }
 
   @Query(() => List, { name: 'list' })
-  findOne(
+  async findOne(
     @Args('id', { type: () => ID }, ParseUUIDPipe) id: string,
     @CurrentUser() user: User
-  ) {
+  ): Promise<List> {
     return this.listsService.findOne(id, user);
   }
 
   @Mutation(() => List)
-  updateList(
+  async updateList(
     @Args('updateListInput') updateListInput: UpdateListInput,
     @CurrentUser() user: User
-  ) {
+  ): Promise<List> {
     return this.listsService.update(updateListInput.id, updateListInput, user);
   }
 
   @Mutation(() => List)
-  removeList(
+  async removeList(
     @Args('id', { type: () => ID }, ParseUUIDPipe) id: string,
     @CurrentUser() user: User
-  ) {
+  ): Promise<List> {
     return this.listsService.remove(id, user);
   }
 
   @Query(() => Int, { name: 'listsCount' })
-  listsCount(@CurrentUser() user: User) {
+  async listsCount(@CurrentUser() user: User): Promise<number> {
     return this.listsService.listsCountByUser(user);
   }
 }

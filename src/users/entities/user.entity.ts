@@ -19,7 +19,7 @@ export class User {
   email: string;
 
   @Column()
-  // @Field(() => String) -- IGNORE --
+  // @Field(() => String) -- IGNORE -- to build the response with the resolveField
   password: string;
 
   @Column({
@@ -38,7 +38,7 @@ export class User {
   // @Field(() => [Item]) // -- IGNORE -- to build the response with the resolveField
   items: Item[];
 
-  @OneToMany(() => List, (list) => list.user, { lazy: true })
+  @OneToMany(() => List, (list) => list.user)
   // @Field(() => [List]) // -- IGNORE -- to build the response with the resolveField
   list: List[];
 
