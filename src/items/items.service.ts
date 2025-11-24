@@ -38,6 +38,7 @@ export class ItemsService {
 
     return await queryBuilder.getMany();
 
+    // other way
     // return await this.itemsRepository.find({
     //   take: limit,
     //   skip: offset,

@@ -34,7 +34,7 @@ export class User {
   isActive: boolean;
 
   @OneToMany(() => Item, (item) => item.user, { lazy: true })
-  @Field(() => [Item])
+  // @Field(() => [Item]) // -- IGNORE -- to build the response with the resolveField
   items: Item[];
 
   //TODO: Add relations

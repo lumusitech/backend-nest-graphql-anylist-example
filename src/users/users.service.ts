@@ -12,6 +12,7 @@ import { Repository } from 'typeorm';
 import { ValidRoles } from '../auth/enums/valid-roles.enum';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
+import { PaginationArgs, SearchArgs } from 'src/common/dto/args';
 
 interface CustomErrorDB {
   code: string;
@@ -40,7 +41,10 @@ export class UsersService {
     }
   }
 
-  async findAll(roles: ValidRoles[]): Promise<User[]> {
+  async findAll(roles: ValidRoles[], paginationArgs: PaginationArgs, searchArgs: SearchArgs): Promise<User[]> {
+    const { offset, limit } = paginationArgs;
+    const { search } = searchArgs;
+
     if (roles.length === 0) return this.usersRepository.find(
       //? Not necessary because we have lazy: true within this property
       // {
@@ -50,10 +54,19 @@ export class UsersService {
       // }
     );
 
-    return this.usersRepository.createQueryBuilder()
+    const queryBuilder = this.usersRepository.createQueryBuilder()
       .andWhere('ARRAY[roles] && ARRAY[:...roles]')
       .setParameter('roles', roles)
-      .getMany();
+      .skip(offset)
+      .take(limit)
+
+    if (search) {
+      // 'LOWER(fullName) LIKE :search' --> TypeORM transform fullName to fullname and search this column
+      // to void the transform you can use "fullName" with double quotes
+      queryBuilder.andWhere('LOWER("fullName") LIKE :search', { search: `%${search.toLowerCase()}%` });
+    }
+
+    return queryBuilder.getMany();
   }
 
   async findOneByEmail(email: string): Promise<User> {
