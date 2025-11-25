@@ -35,13 +35,12 @@ export class ListItemService {
       //? find the list item with the relations filled
       return await this.findOne(listItem.id);
     } catch (error) {
-      if (typeof error === 'object' && error !== null && 'code' in error) {
-        const dbError = error as { code: string };
+      const dbError = error as { code: string };
 
-        if (dbError.code === '23505') {
-          throw new BadRequestException('Already exists list item within list');
-        }
+      if (dbError?.code === '23505') {
+        throw new BadRequestException('Already exists list item within list');
       }
+
       throw new InternalServerErrorException('Please check server logs');
     }
   }
