@@ -1,7 +1,14 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Item } from 'src/items/entities/item.entity';
 import { List } from 'src/lists/entities/list.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @ObjectType()
 @Entity({ name: 'users' })
@@ -42,7 +49,10 @@ export class User {
   // @Field(() => [List]) // -- IGNORE -- to build the response with the resolveField
   list: List[];
 
-  @ManyToOne(() => User, (user) => user.lastUpdateBy, { nullable: true, lazy: true })
+  @ManyToOne(() => User, (user) => user.lastUpdateBy, {
+    nullable: true,
+    lazy: true,
+  })
   @JoinColumn({ name: 'last_update_by' })
   @Field(() => User, { nullable: true })
   lastUpdateBy?: User;

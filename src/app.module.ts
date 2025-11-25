@@ -68,4 +68,4 @@ import { ListItemModule } from './list-item/list-item.module';
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

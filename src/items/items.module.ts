@@ -9,4 +9,4 @@ import { ItemsService } from './items.service';
   imports: [TypeOrmModule.forFeature([Item])],
   exports: [ItemsService, TypeOrmModule],
 })
-export class ItemsModule { }
+export class ItemsModule {}

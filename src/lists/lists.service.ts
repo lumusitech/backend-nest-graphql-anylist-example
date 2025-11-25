@@ -14,8 +14,8 @@ export class ListsService {
   constructor(
     @InjectRepository(List)
     private readonly listRepository: Repository<List>,
-    private readonly listItemService: ListItemService
-  ) { }
+    private readonly listItemService: ListItemService,
+  ) {}
 
   async create(createListInput: CreateListInput, user: User): Promise<List> {
     const newItem = this.listRepository.create({ ...createListInput, user });
@@ -25,17 +25,24 @@ export class ListsService {
     return await this.listRepository.save(newItem);
   }
 
-  async findAll(user: User, paginationArgs: PaginationArgs, searchArgs: SearchArgs): Promise<List[]> {
+  async findAll(
+    user: User,
+    paginationArgs: PaginationArgs,
+    searchArgs: SearchArgs,
+  ): Promise<List[]> {
     const { offset, limit } = paginationArgs;
     const { search } = searchArgs;
 
-    const queryBuilder = this.listRepository.createQueryBuilder()
+    const queryBuilder = this.listRepository
+      .createQueryBuilder()
       .skip(offset)
       .take(limit)
-      .where(`"userId" = :userId`, { userId: user.id })
+      .where(`"userId" = :userId`, { userId: user.id });
 
     if (search) {
-      queryBuilder.andWhere('LOWER(name) like :name', { name: `%${search.toLowerCase()}%` })
+      queryBuilder.andWhere('LOWER(name) like :name', {
+        name: `%${search.toLowerCase()}%`,
+      });
     }
 
     return await queryBuilder.getMany();
@@ -43,13 +50,20 @@ export class ListsService {
 
   async findOne(id: string, user: User): Promise<List> {
     try {
-      return await this.listRepository.findOneByOrFail({ id, user: { id: user.id } })
+      return await this.listRepository.findOneByOrFail({
+        id,
+        user: { id: user.id },
+      });
     } catch (error) {
       throw new NotFoundException(`List with ID ${id} not found`);
     }
   }
 
-  async update(id: string, updateListInput: UpdateListInput, user: User): Promise<List> {
+  async update(
+    id: string,
+    updateListInput: UpdateListInput,
+    user: User,
+  ): Promise<List> {
     const list = await this.findOne(id, user);
 
     const updatedList = Object.assign(list, updateListInput);
@@ -63,14 +77,22 @@ export class ListsService {
   }
 
   async listsCountByUser(user: User): Promise<number> {
-    return await this.listRepository.count({ where: { user: { id: user.id } } });
+    return await this.listRepository.count({
+      where: { user: { id: user.id } },
+    });
   }
 
-  async getListItemByList(list: List, paginationArgs: PaginationArgs, searchArgs: SearchArgs): Promise<ListItem[]> {
+  async getListItemByList(
+    list: List,
+    paginationArgs: PaginationArgs,
+    searchArgs: SearchArgs,
+  ): Promise<ListItem[]> {
     return await this.listItemService.findAll(list, paginationArgs, searchArgs);
   }
 
   async getListItemCountByList(list: List): Promise<number> {
-    return await this.listItemService.getListItemCountByList({ where: { list: { id: list.id } } });
+    return await this.listItemService.getListItemCountByList({
+      where: { list: { id: list.id } },
+    });
   }
 }

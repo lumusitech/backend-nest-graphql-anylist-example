@@ -1,17 +1,23 @@
 import { ObjectType, Field, Int, ID } from '@nestjs/graphql';
 import { Item } from 'src/items/entities/item.entity';
 import { List } from 'src/lists/entities/list.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
 
-@Entity("ListItems")
+@Entity('ListItems')
 @ObjectType()
 @Unique('listItem-item', ['list', 'item'])
 export class ListItem {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   @Field(() => ID)
   id: string;
 
-  @Column({ type: "numeric" })
+  @Column({ type: 'numeric' })
   @Field(() => Int)
   quantity: number;
 
@@ -21,10 +27,10 @@ export class ListItem {
 
   //? Relations
   @ManyToOne(() => List, (list) => list.listItem, { lazy: true })
-  @Field(() => List) // we do not need to get the list from the list item
-  list: List
+  @Field(() => List)
+  list: List;
 
   @ManyToOne(() => Item, (item) => item.listItem, { lazy: true })
   @Field(() => Item)
-  item: Item
+  item: Item;
 }

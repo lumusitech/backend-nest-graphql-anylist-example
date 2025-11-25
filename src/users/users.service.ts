@@ -26,7 +26,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
-  ) { }
+  ) {}
 
   async create(signupInput: SignupInput) {
     try {
@@ -41,29 +41,38 @@ export class UsersService {
     }
   }
 
-  async findAll(roles: ValidRoles[], paginationArgs: PaginationArgs, searchArgs: SearchArgs): Promise<User[]> {
+  async findAll(
+    roles: ValidRoles[],
+    paginationArgs: PaginationArgs,
+    searchArgs: SearchArgs,
+  ): Promise<User[]> {
     const { offset, limit } = paginationArgs;
     const { search } = searchArgs;
 
-    if (roles.length === 0) return this.usersRepository.find(
-      //? Not necessary because we have lazy: true within this property
-      // {
-      //   relations: {
-      //     lastUpdateBy: true,
-      //   }
-      // }
-    );
+    if (roles.length === 0)
+      return this.usersRepository
+        .find
+        //? Not necessary because we have lazy: true within this property
+        // {
+        //   relations: {
+        //     lastUpdateBy: true,
+        //   }
+        // }
+        ();
 
-    const queryBuilder = this.usersRepository.createQueryBuilder()
+    const queryBuilder = this.usersRepository
+      .createQueryBuilder()
       .andWhere('ARRAY[roles] && ARRAY[:...roles]')
       .setParameter('roles', roles)
       .skip(offset)
-      .take(limit)
+      .take(limit);
 
     if (search) {
       // 'LOWER(fullName) LIKE :search' --> TypeORM transform fullName to fullname and search this column
       // to void the transform you can use "fullName" with double quotes
-      queryBuilder.andWhere('LOWER("fullName") LIKE :search', { search: `%${search.toLowerCase()}%` });
+      queryBuilder.andWhere('LOWER("fullName") LIKE :search', {
+        search: `%${search.toLowerCase()}%`,
+      });
     }
 
     return queryBuilder.getMany();
@@ -98,7 +107,11 @@ export class UsersService {
   }
 
   //? Update v1: My way
-  async updateV1(id: string, updateUserInput: UpdateUserInput, adminUser: User): Promise<User> {
+  async updateV1(
+    id: string,
+    updateUserInput: UpdateUserInput,
+    adminUser: User,
+  ): Promise<User> {
     const user = await this.findOneById(id);
 
     try {
@@ -112,7 +125,11 @@ export class UsersService {
     }
   }
 
-  async update(id: string, updateUserInput: UpdateUserInput, adminUser: User): Promise<User> {
+  async update(
+    id: string,
+    updateUserInput: UpdateUserInput,
+    adminUser: User,
+  ): Promise<User> {
     try {
       const user = await this.usersRepository.preload({
         ...updateUserInput,
@@ -130,7 +147,6 @@ export class UsersService {
       this.handleDbErrors(error as unknown as CustomErrorDB);
     }
   }
-
 
   async block(id: string, adminUser: User): Promise<User> {
     const userToBlock = await this.findOneById(id);
@@ -152,7 +168,10 @@ export class UsersService {
       );
     }
 
-    if (error.code === 'custom-error-001') {
+    if (
+      error.code === 'custom-error-001' ||
+      error.code === 'custom-error-002'
+    ) {
       throw new NotFoundException(
         error.detail
           //? For a better message you can use:

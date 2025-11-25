@@ -12,10 +12,10 @@ export class UpdateUserInput extends PartialType(CreateUserInput) {
   @Field(() => [ValidRoles], { nullable: true })
   @IsOptional()
   @IsEnum(ValidRoles, { each: true })
-  roles?: ValidRoles[]
+  roles?: ValidRoles[];
 
   @Field(() => Boolean, { nullable: true })
   @IsBoolean()
   @IsOptional()
-  isActive?: boolean
+  isActive?: boolean;
 }

@@ -1,4 +1,13 @@
-import { Resolver, Query, Mutation, Args, Int, ID, ResolveField, Parent } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ID,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { ListsService } from './lists.service';
 import { List } from './entities/list.entity';
 import { CreateListInput } from './dto/create-list.input';
@@ -13,12 +22,12 @@ import { ListItem } from 'src/list-item/entities/list-item.entity';
 @Resolver(() => List)
 @UseGuards(JwtAuthGuard)
 export class ListsResolver {
-  constructor(private readonly listsService: ListsService) { }
+  constructor(private readonly listsService: ListsService) {}
 
   @Mutation(() => List)
   async createList(
     @Args('createListInput') createListInput: CreateListInput,
-    @CurrentUser() user: User
+    @CurrentUser() user: User,
   ): Promise<List> {
     return this.listsService.create(createListInput, user);
   }
@@ -35,7 +44,7 @@ export class ListsResolver {
   @Query(() => List, { name: 'list' })
   async findOne(
     @Args('id', { type: () => ID }, ParseUUIDPipe) id: string,
-    @CurrentUser() user: User
+    @CurrentUser() user: User,
   ): Promise<List> {
     return this.listsService.findOne(id, user);
   }
@@ -43,7 +52,7 @@ export class ListsResolver {
   @Mutation(() => List)
   async updateList(
     @Args('updateListInput') updateListInput: UpdateListInput,
-    @CurrentUser() user: User
+    @CurrentUser() user: User,
   ): Promise<List> {
     return this.listsService.update(updateListInput.id, updateListInput, user);
   }
@@ -51,7 +60,7 @@ export class ListsResolver {
   @Mutation(() => List)
   async removeList(
     @Args('id', { type: () => ID }, ParseUUIDPipe) id: string,
-    @CurrentUser() user: User
+    @CurrentUser() user: User,
   ): Promise<List> {
     return this.listsService.remove(id, user);
   }
@@ -65,15 +74,17 @@ export class ListsResolver {
   async getListItems(
     @Parent() list: List,
     @Args() paginationArgs: PaginationArgs,
-    @Args() searchArgs: SearchArgs
+    @Args() searchArgs: SearchArgs,
   ): Promise<ListItem[]> {
-    return this.listsService.getListItemByList(list, paginationArgs, searchArgs);
+    return this.listsService.getListItemByList(
+      list,
+      paginationArgs,
+      searchArgs,
+    );
   }
 
   @ResolveField(() => Int, { name: 'itemsCount' })
-  async getListItemCountByList(
-    @Parent() list: List,
-  ): Promise<number> {
+  async getListItemCountByList(@Parent() list: List): Promise<number> {
     return this.listsService.getListItemCountByList(list);
   }
 }
