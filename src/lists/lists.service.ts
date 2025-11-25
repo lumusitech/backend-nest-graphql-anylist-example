@@ -6,12 +6,15 @@ import { PaginationArgs, SearchArgs } from 'src/common/dto/args';
 import { InjectRepository } from '@nestjs/typeorm';
 import { List } from './entities/list.entity';
 import { Repository } from 'typeorm';
+import { ListItem } from 'src/list-item/entities/list-item.entity';
+import { ListItemService } from 'src/list-item/list-item.service';
 
 @Injectable()
 export class ListsService {
   constructor(
     @InjectRepository(List)
-    private readonly listRepository: Repository<List>
+    private readonly listRepository: Repository<List>,
+    private readonly listItemService: ListItemService
   ) { }
 
   async create(createListInput: CreateListInput, user: User): Promise<List> {
@@ -61,5 +64,13 @@ export class ListsService {
 
   async listsCountByUser(user: User): Promise<number> {
     return await this.listRepository.count({ where: { user: { id: user.id } } });
+  }
+
+  async getListItemByList(list: List, paginationArgs: PaginationArgs, searchArgs: SearchArgs): Promise<ListItem[]> {
+    return await this.listItemService.findAll(list, paginationArgs, searchArgs);
+  }
+
+  async getListItemCountByList(list: List): Promise<number> {
+    return await this.listItemService.getListItemCountByList({ where: { list: { id: list.id } } });
   }
 }
