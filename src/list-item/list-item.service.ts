@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -17,6 +18,7 @@ export class ListItemService {
     @InjectRepository(ListItem)
     private readonly listItemRepository: Repository<ListItem>,
   ) {}
+
   async create(createListItemInput: CreateListItemInput): Promise<ListItem> {
     const { listId, itemId, ...rest } = createListItemInput;
 
@@ -32,7 +34,14 @@ export class ListItemService {
 
       //? find the list item with the relations filled
       return await this.findOne(listItem.id);
-    } catch {
+    } catch (error) {
+      if (typeof error === 'object' && error !== null && 'code' in error) {
+        const dbError = error as { code: string };
+
+        if (dbError.code === '23505') {
+          throw new BadRequestException('Already exists list item within list');
+        }
+      }
       throw new InternalServerErrorException('Please check server logs');
     }
   }
