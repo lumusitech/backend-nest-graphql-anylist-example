@@ -1,5 +1,5 @@
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { ApolloDriver } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -19,6 +19,11 @@ import { ListItemModule } from './list-item/list-item.module';
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
+      // For deploy with SSL
+      ssl: process.env.STATE === 'prod' ? { rejectUnauthorized: false } : false,
+      extra: {
+        sslmode: process.env.STATE === 'prod' ? 'require' : undefined,
+      },
       host: process.env.DB_HOST || 'localhost',
       port: process.env.DB_PORT ? +process.env.DB_PORT : 5432,
       username: process.env.DB_USERNAME || 'postgres',
@@ -41,11 +46,11 @@ import { ListItemModule } from './list-item/list-item.module';
       driver: ApolloDriver,
       imports: [AuthModule],
       inject: [JwtService],
-      useFactory: async (jwtService: JwtService) => ({
+      useFactory: (_jwtService: JwtService) => ({
         playground: false,
         autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
         plugins: [ApolloServerPluginLandingPageLocalDefault()],
-        context: ({ req }) => {
+        context: ({ _req }) => {
           //? This hide the schemas for non authenticated users, but the login and register method too
           //? Solution: Implement a rest full api endpoint for login and register
           // const token = req.headers.authorization?.replace('Bearer ', '');
